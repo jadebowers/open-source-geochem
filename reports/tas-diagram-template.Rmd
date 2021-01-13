@@ -1,0 +1,251 @@
+---
+title: "Total Alkali-Silica diagram"
+author: "Jade Bowers"
+date: "1/12/2021"
+output: html_document
+---
+
+## **Abstract**
+The total alkali-silica diagram is one of the most useful ways for classifying volcanics rocks. The diagram divides rocks into ultramafic, mafic, intermediate, felsic based on their silica content and into subalkaline/tholeittic and alkaline based on their total alkali content. This diagram is typically the first chemical plot made when performing data analysis on volcanic samples. 
+
+```{r setup, include=FALSE}
+#this code chunk only pertains to the function of the Markdown document and is not necessary for running the code itself in an R script
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Introduction**
+The R Markdown document is designed as a template for open source use and contains five code chunks necessary for recreate the TAS diagram on your own in a separate R script.  
+   
+**1. Required packages  
+2. TAS diagram skeleton (lines and axes)  
+3. Labels for the igenous compositional names  
+4. Data loading  
+5. Creating the plot**  
+
+  
+## **The Code**
+
+### *1. Required package(s)*
+
+The only package you need to run this specific code is the tidyverse package. If you have not used this package before make sure you have have it installed by running install.packages(tidyverse) first.
+
+
+```{r packages, echo = TRUE, results = 'hide', message=FALSE}
+library(tidyverse)
+```
+
+
+
+
+### *2. TAS diagram skeleton*
+
+The diagram skeleton contains all of the code that creates the nomenclature boundaries seen on the classic TAS diagrams in the literature. I do not suggest editing this structure. 
+
+**Tip #1: If you vary the axis in the later plot and any line segment with an end point outside the new boundaries will disappear from the plot and you will have to figure out the new end point for the new boundaries.**
+
+
+```{r TAS diagram skeleton}
+diagram <- ggplot() + 
+  geom_segment(aes(x = 41, y = 0.5, 
+                   xend = 41, yend = 7), 
+               size=0.25) +
+  geom_segment(aes(x = 41, y = 3,
+                   xend = 45, yend = 3),
+               size = 0.25) +
+  geom_segment(aes(x = 45, y = 0.5, 
+                   xend = 45, yend = 5), 
+               size=0.25) +
+  geom_segment(aes(x = 45, y = 5, 
+                   xend = 52, yend = 5), 
+               size=0.25) +
+  geom_segment(aes(x = 52, y = 0.5, 
+                   xend = 52, yend = 5), 
+               size=0.25) + 
+  geom_segment(aes(x = 52, y = 5, 
+                   xend = 69, yend = 8), 
+               size=0.25) + 
+  geom_segment(aes(x = 69, y = 8, 
+                   xend = 76.5, yend = 0.5), 
+               size=0.25) + 
+  geom_segment(aes(x = 63, y = 0.5, 
+                   xend = 63, yend = 7), 
+               size=0.25) + 
+  geom_segment(aes(x = 45, y = 5, 
+                   xend = 65, yend = 15), 
+               size=0.25) + 
+  geom_segment(aes(x = 41, y = 7, 
+                   xend = 52.5, yend = 14), 
+               size=0.25) + 
+  geom_segment(aes(x = 52, y = 5, 
+                   xend = 49.4, yend = 7.3), 
+               size=0.25) +
+  geom_segment(aes(x = 57, y = 5.9, 
+                   xend = 53, yend = 9.3), 
+               size=0.25) +
+  geom_segment(aes(x = 57.6, y = 11.7, 
+                   xend = 63, yend = 7), 
+               size=0.25) +
+  geom_segment(aes(x = 69, y = 8, 
+                   xend = 69, yend = 12.2), 
+               size=0.25) +
+  geom_segment(aes(x = 45, y = 9.4, 
+                   xend = 49.4, yend = 7.3), 
+               size=0.25) +
+  geom_segment(aes(x = 53, y = 9.3, 
+                   xend = 48.4, yend = 11.5), 
+               size=0.25) +
+  geom_segment(aes(x = 57.6, y = 11.7, 
+                   xend = 49, yend = 15.5), 
+               size=0.25) +
+  geom_segment(aes(x = 57, y = 0.5, 
+                   xend = 57, yend = 5.9), 
+               size=0.25) 
+print(diagram)
+```
+
+
+
+
+### *3. Labels for igneous compositions*
+
+The nomenclature labels are assigned in this chunk of code and when added to the skeleton will appear in the respective polygons. 
+
+**Tip #2: Labels can be removed but make sure to delete their respective values in the x and y assignments as well.**
+
+
+```{r igneous composition name labels}
+compositions <-  annotate("text", 
+                    x = c(48.5, 
+                          54.5, 
+                          54.5, 
+                          60, 
+                          68.5, 
+                          76, 
+                          49, 
+                          49, 
+                          43, 
+                          43,
+                          45,
+                          43.5,
+                          39,
+                          48,
+                          48.5,
+                          52,
+                          52.5,
+                          57.5,
+                          64.5,
+                          65,
+                          57.5,
+                          58,
+                          52.5,
+                          52.5,
+                          53), 
+                    y = c(1.75, 
+                          2, 
+                          1.5, 
+                          1.75, 
+                          1.75, 
+                          6, 
+                          6, 
+                          5.5, 
+                          2.5, 
+                          2,
+                          7.5,
+                          6,
+                          9,
+                          9.5,
+                          9,
+                          12,
+                          11.5,
+                          14,
+                          11.5,
+                          8.5,
+                          8.5,
+                          8,
+                          7.5,
+                          7,
+                          6.5), 
+                    label = c("Basalt", 
+                              "Basaltic", 
+                              "Andesite", 
+                              "Andesite", 
+                              "Dacite", 
+                              "Rhyolite", 
+                              "Trachy-", 
+                              "basalt", 
+                              "Picro-", 
+                              "basalt",
+                              "Tephrite",
+                              "Basanite",
+                              "Foidite",
+                              "Phono-",
+                              "Tephrite",
+                              "Tephri",
+                              "phonolite",
+                              "Phonolite",
+                              "Trachyte",
+                              "Trachydacite",
+                              "Trachy-",
+                              "andesite",
+                              "Basaltic",
+                              "trachy-",
+                              "andesite"), 
+                    hjust = .5, fontface = 2, size = 4.5)
+```
+
+
+
+
+### *4. Adding your data*
+
+The sum of the Na~2~O and K~2~O content (total alkalis, TAS) and the SiO~2~ content can be taken directly from a rock analysis as wt % oxide and plotted directly on to the diagram. This chucnk of code is used to load in your geochemical data. 
+
+**Tip #3: You can also use the import dataset feature in the environment window and skip running this code chunk**
+
+
+```{r data, results='hide', message=FALSE}
+example_data <- read_csv("../data/tas_example_data.csv")
+
+```
+
+
+
+
+### *5. Creating the plot*
+
+The final step is plotting your data over the skeleton and labels we just made.   
+  
+**Important notes:**  
+  
+* diagram plots the skeleton  
+* compositions plots the labels  
+* geom_point plots your data as points on the scatter plot  
+* aes() attributes what values you want to specifically plot  
+**Tip #4: If you don't have a TAS column calculated, replace tas with <Na~2~O column_name>  + <K~2~O column_name>**  
+**Tip #5: This is also where you can represent different groups/samples of your data by colors and shapes**  
+* theme_classic() gives the plot a simple white background and two black axes  
+* theme() contains arguments and functions for controlling the appearance of the lines, tick marks, text size etc. These can be easily altered to personal preference.   
+* scale_x_continuous() formats the the x axis  
+* scale_y_continuous() formats the the y axis  
+* labs() formats the axes labels  
+
+
+```{r TAS complete plot}
+diagram + 
+  compositions +
+  geom_point(data = example_data) + 
+  aes(x = sio2, y = tas) + 
+  theme_classic() +
+  theme(axis.line = element_line(colour = "black"),
+        axis.title = element_text(face = "bold", size = 20),
+        axis.text.x = element_text(face = "bold", size = 14),
+        axis.text.y = element_text(face = "bold", size = 14),
+        legend.background = element_rect(fill = "grey95", size = 0.7, linetype = "solid", colour = "black"), 
+        legend.text = element_text(size = 11), legend.justification = c(0,0), legend.position = c(0.05,0.03), aspect.ratio = .7) +
+  scale_x_continuous(breaks= seq(35,80,by=5), limits = c(35,80), expand = c(0,0)) + 
+  scale_y_continuous(breaks= seq(0,16,by=2), limits = c(0,16), expand = c(0,0)) +
+  labs(x=expression(SiO[2]* " (wt%)"), y=expression("Total Alkali Silica"*"  (wt%)"))
+```
+
+# **Happy coding!**
