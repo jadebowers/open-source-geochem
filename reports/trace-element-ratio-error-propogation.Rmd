@@ -1,0 +1,57 @@
+---
+title: "Error Propagation for Trace Element Ratios"
+author: "Jade Bowers"
+date: "2023-07-25"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Error Propagation for Trace Element Ratios
+
+Often, uncertainty is only plotted on element-element bivariate diagrams.
+Including error bars on bivariates that have an element-element ratio on one of the axes requires error propagation through the ratio calculation.
+
+Example: You want to include error bars on your plot of La/Sm
+
+```{r}
+errorMat <- matrix(nrow = 1, ncol = 3)
+errorMat[,1] <- 0.0126
+errorMat[,2] <- 0.0124
+rownames(errorMat) <- "oneSig"
+colnames(errorMat) <- c("La", "Sm", "LaSm")
+
+data <- matrix(nrow = 1, ncol = 2)
+data[,1] <- 12
+data[,2] <- 2.63
+rownames(data) <- "sample"
+colnames(data) <- c("La", "Sm")
+```
+
+Simple function for propagating error through calculation of an element-element ratio.
+
+```{r}
+error_prop <- function(x, y, delta_x, delta_y) {
+  # Inputs:
+    ##  x = concentration of numerator element in your sample
+    ##  y = concentration of denominator element in your sample
+    ##  delta_x = one sigma uncertainty of numerator element
+    ##  delta_y = one sigma uncertainty of denominator element
+  # Outputs:
+    ##  delta_z = one sigma uncertainty of trace element ratio
+  
+    delta_z = (x/y) * sqrt(((delta_x/x)^2) + ((delta_y/y)^2))
+
+  return(delta_z)
+}
+```
+
+```{r}
+errorMat["oneSig", "LaSm"] <- error_prop(x = data[1,"La"], 
+                                       y = data[1,"Sm"], 
+                                       delta_x = errorMat["oneSig", "La"], 
+                                       delta_y = errorMat["oneSig", "Sm"])
+print(errorMat)
+```
