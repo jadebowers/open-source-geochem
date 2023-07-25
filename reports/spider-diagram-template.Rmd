@@ -1,0 +1,68 @@
+---
+title: "Spider Diagrams"
+author: "Jade Bowers"
+date: "1/13/2021"
+output: html_document
+---
+
+## **Abstract**  
+  
+
+```{r setup, include=FALSE}
+#this code chunk only pertains to the function of the Markdown document and is not necessary for running the code itself in an R script
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+  
+## **Introduction**  
+  
+The R Markdown document is designed as a template for open source use and contains five code chunks necessary for recreate a spider diagram on your own in a separate R script.   
+  
+  
+## **The Code**
+
+### *1. Required package(s)*  
+```{r packages, echo=TRUE, results='hide', message=FALSE}
+library(tidyverse)
+library(tidyr)
+library(dplyr)
+library(ggpubr)
+library(ggthemes)
+```
+ 
+```{r creating sequencing of elements}
+#list of traditional TEs for filtering
+traditional = c("Rb","Ba", "Th" ,"U","Nb", "La", 
+                "Ce","Pb","Sr", "Nd","Zr","Hf", 
+                "Sm", "Eu", "Gd", "Tb", "Dy", "Y", 
+                "Ho", "Er", "Yb", "Lu")  
+
+#sequencing the elements so the appear in the correct order on the x axis, creates a df to join with your data
+TE_seq = data.frame(elements = traditional,
+                    seq = seq(1:length(traditional)))
+```
+
+
+```{r load data, results='hide', message=FALSE}
+example_data <- read_csv("../data/spider_example_data.csv")
+example_data <- example_data %>% select(sample, Cs:Lu) %>% gather(key = "element", value = "value", -sample)
+sequenced_data <- example_data %>% inner_join(TE_seq, by = c("element" = "elements"))
+```
+
+```{r}
+spider_diagram <- ggplot() +
+ aes(x = seq, y = value) +
+  scale_x_continuous(name = "", breaks = sequenced_data$seq, labels =sequenced_data$element) +
+  ylab("Sample") +
+  scale_y_log10(breaks = c(0.01, 0.1, 1, 10, 100),
+                labels = c(0.01, 0.1, 1, 10, 100)) +
+  theme_stata()
+```
+
+```{r}
+spider_diagram +
+  geom_line(data = sequenced_data, aes(group = sample, color = sample)) +
+  guides(col = guide_legend(nrow = 3)) +
+  theme(axis.text.y = element_text(angle = 0))
+```
+
